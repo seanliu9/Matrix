@@ -18,10 +18,10 @@ public:
         this->n = num_cols;
 
         // Allocate memory for vals.
-        this->vals = new double*[this->m];
-        for (int i = 0; i < this->m; i++)
+        this->vals = new double*[this->get_m()];
+        for (int i = 0; i < this->get_m(); i++)
         {
-            this->vals[i] = new double[this->n];
+            this->vals[i] = new double[this->get_n()];
         }
     }
 
@@ -31,11 +31,11 @@ public:
         this->n = values[0].size();
 
         // Allocate memory for vals.
-        this->vals = new double*[this->m];
-        for (int i = 0; i < this->m; i++)
+        this->vals = new double*[this->get_m()];
+        for (int i = 0; i < this->get_m(); i++)
         {
-            this->vals[i] = new double[this->n];
-            for (int j = 0; j < this->n; j++)
+            this->vals[i] = new double[this->get_n()];
+            for (int j = 0; j < this->get_n(); j++)
             {
                 this->vals[i][j] = values[i][j];
             }
@@ -45,7 +45,7 @@ public:
     ~Matrix()
     {
         // Delete each row in vals.
-        for (int i = 0; i < this->m; i++)
+        for (int i = 0; i < this->get_m(); i++)
         {
             delete[] vals[i];
         }
@@ -75,14 +75,14 @@ public:
 
     Matrix operator + (const Matrix& op) const
     {
-        if (this->m != op.get_m() || this->n != op.get_n())
+        if (this->get_m() != op.get_m() || this->get_n() != op.get_n())
         {
             throw runtime_error("Matrices must have the same dimensions.");
         }
-        Matrix result(this->m, this->n);
-        for (int i = 0; i < this->m; i++)
+        Matrix result(this->get_m(), this->get_n());
+        for (int i = 0; i < this->get_m(); i++)
         {
-            for (int j = 0; j < this->n; j++)
+            for (int j = 0; j < this->get_n(); j++)
             {
                 result.set_val(i, j, this->vals[i][j] + op.get_vals()[i][j]);
             }
@@ -92,18 +92,18 @@ public:
 
     Matrix operator * (const Matrix& op) const
     {
-        if (this->n != op.get_m())
+        if (this->get_n() != op.get_m())
         {
             throw runtime_error("Matrix 1's number of columns must equal Matrix 2's number of rows.");
         }
-        Matrix result(this->m, op.get_n());
+        Matrix result(this->get_m(), op.get_n());
         int x = 0;
-        for (int i = 0; i < this->m; i++)
+        for (int i = 0; i < this->get_m(); i++)
         {
             for (int j = 0; j < op.get_n(); j++)
             {
                 x = 0;
-                for (int k = 0; k < this->n; k++)
+                for (int k = 0; k < this->get_n(); k++)
                 {
                     x += this->vals[i][k] * op.get_vals()[k][j];
                 }
