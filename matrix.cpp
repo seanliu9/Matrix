@@ -1,0 +1,189 @@
+#include <stdexcept>
+#include <vector>
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+class Matrix
+{
+private:
+    int m; // number of rows
+    int n; // number of columns
+    double **vals; // 2-D array of values in the matrix
+
+public:
+    Matrix(const int num_rows, const int num_cols)
+    {
+        this->m = num_rows;
+        this->n = num_cols;
+
+        // Allocate memory for vals.
+        this->vals = new double*[this->m];
+        for (int i = 0; i < this->m; i++)
+        {
+            this->vals[i] = new double[this->n];
+        }
+    }
+
+    Matrix(const std::vector<std::vector<double>>& values)
+    {
+        this->m = values.size();
+        this->n = values[0].size();
+
+        // Allocate memory for vals.
+        this->vals = new double*[this->m];
+        for (int i = 0; i < this->m; i++)
+        {
+            this->vals[i] = new double[this->n];
+            for (int j = 0; j < this->n; j++)
+            {
+                this->vals[i][j] = values[i][j];
+            }
+        }
+    }
+
+    ~Matrix()
+    {
+        // Delete each row in vals.
+        for (int i = 0; i < this->m; i++)
+        {
+            delete[] vals[i];
+        }
+        // Delete the array of pointers (vals).
+        delete[] vals;
+    }
+
+    int get_m() const
+    {
+        return this->m;
+    }
+
+    int get_n() const
+    {
+        return this->n;
+    }
+
+    double** get_vals() const
+    {
+        return this->vals;
+    }
+
+    void set_val(const int i, const int j, const int val)
+    {
+        this->vals[i][j] = val;
+    }
+
+    Matrix operator + (const Matrix& op) const
+    {
+        if (this->m != op.get_m() || this->n != op.get_n())
+        {
+            throw runtime_error("Matrices must have the same dimensions.");
+        }
+        Matrix result(this->m, this->n);
+        for (int i = 0; i < this->m; i++)
+        {
+            for (int j = 0; j < this->n; j++)
+            {
+                result.set_val(i, j, this->vals[i][j] + op.get_vals()[i][j]);
+            }
+        }
+        return result;
+    }
+
+    Matrix operator * (const Matrix& op) const
+    {
+        if (this->n != op.get_m())
+        {
+            throw runtime_error("Matrix 1's number of columns must equal Matrix 2's number of rows.");
+        }
+        Matrix result(this->m, op.get_n());
+        int x = 0;
+        for (int i = 0; i < this->m; i++)
+        {
+            for (int j = 0; j < op.get_n(); j++)
+            {
+                x = 0;
+                for (int k = 0; k < this->n; k++)
+                {
+                    x += this->vals[i][k] * op.get_vals()[k][j];
+                }
+                result.set_val(i, j, x);
+            }
+        }
+        return result;
+    }
+
+    friend ostream& operator << (ostream& os, const Matrix& op)
+    {
+        for (int i = 0; i < op.get_m(); i++) 
+        {
+            os << "[ ";
+            for (int j = 0; j < op.get_n(); j++) 
+            {
+                os << std::setw(4) << op.get_vals()[i][j] << " ";
+            }
+            os << " ]" << std::endl;
+        }
+        return os;
+    }
+};
+
+// Matrix operator + (const Matrix& op1, const Matrix& op2)
+// {
+//     if (op1.get_m() != op2.get_m() || op1.get_n() != op2.get_n())
+//     {
+//         throw runtime_error("Matrices must have the same dimensions.");
+//     }
+//     Matrix result(op1.get_m(), op1.get_n());
+//     for (int i = 0; i < op1.get_m(); i++)
+//     {
+//         for (int j = 0; j < op1.get_n(); j++)
+//         {
+//             result.set_val(i, j, op1.get_vals()[i][j] + op2.get_vals()[i][j]);
+//         }
+//     }
+//     return result;
+// }
+
+// Matrix operator * (const Matrix& op1, const Matrix& op2)
+// {
+//     if (op1.get_n() != op2.get_m())
+//     {
+//         throw runtime_error("Matrix 1's number of columns must equal Matrix 2's number of rows.");
+//     }
+//     Matrix result(op1.get_m(), op2.get_n());
+//     int x = 0;
+//     for (int i = 0; i < op1.get_m(); i++)
+//     {
+//         for (int j = 0; j < op2.get_n(); j++)
+//         {
+//             x = 0;
+//             for (int k = 0; k < op1.get_n(); k++)
+//             {
+//                 x += op1.get_vals()[i][k] * op2.get_vals()[k][j];
+//             }
+//             result.set_val(i, j, x);
+//         }
+//     }
+//     return result;
+// }
+
+int main()
+{
+    cout << "Testing matrix addition: " << endl;
+    Matrix a({{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}});
+    cout << "a: " << endl << a << endl;
+    Matrix b ({{2, 2, 2, 2}, {2, 2, 2, 2}, {2, 2, 2, 2}});
+    cout << "b: " << endl << b << endl;
+    Matrix c = a + b;
+    cout << "c = a + b: " << endl << c << endl;
+    Matrix d = b + c;
+    cout << "d = b + c:" << endl << d << endl;
+
+    cout << "Testing matrix multiplication: " << endl;
+    Matrix e({{2, 1, 3}, {1, 4, 7}});
+    Matrix f({{1, 1, 2, 6}, {3, 1, 2, 3}, {2, 4, 5, 1}});
+    Matrix g = e * f;
+    cout << "g = e * f: " << endl << g << endl;
+
+}
