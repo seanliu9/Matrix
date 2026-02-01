@@ -45,18 +45,8 @@ public:
     // copy constructor
     Matrix(const Matrix& mat)
     {
-        this->m = mat.get_m();
-        this->n = mat.get_n();
-        // Allocate memory for vals.
-        this->vals = new double*[this->get_m()];
-        for (int i = 0; i < this->get_m(); i++)
-        {
-            this->vals[i] = new double[this->get_n()];
-            for (int j = 0; j < this->get_n(); j++)
-            {
-                this->vals[i][j] = mat.get_vals()[i][j];
-            }
-        }
+        this->vals = nullptr;
+        this->copy_from(mat);
     }
 
     ~Matrix()
@@ -130,6 +120,44 @@ public:
         return result;
     }
 
+    void copy_from (const Matrix& mat)
+    {
+        // Delete the old vals.
+        if (this->get_vals() != nullptr)
+        {   
+            for (int i = 0; i < this->get_m(); i++)
+            {
+                delete[] vals[i];
+            }
+            delete[] vals;
+        }
+
+        if (this != &mat)
+        {
+            this->m = mat.get_m();
+            this->n = mat.get_n();
+            // Allocate memory for vals.
+            this->vals = new double*[this->get_m()];
+            for (int i = 0; i < this->get_m(); i++)
+            {
+                this->vals[i] = new double[this->get_n()];
+                for (int j = 0; j < this->get_n(); j++)
+                {
+                    this->set_val(i, j, mat.get_vals()[i][j]);
+                }
+            }
+        }
+    }
+
+    Matrix& operator = (const Matrix& op)
+    {
+        if (this != &op)
+        {
+            this->copy_from(op);
+        }
+        return *this;
+    }
+
     friend ostream& operator << (ostream& os, const Matrix& op)
     {
         for (int i = 0; i < op.get_m(); i++) 
@@ -190,8 +218,11 @@ int main()
     cout << "Testing copy constructor: " << endl;
     Matrix m1({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}, {13, 14, 15}});
     Matrix m2(m1);
+    Matrix m3 = m2;
     cout << "m1: " << endl << m1 << endl;
     cout << "m2: " << endl << m2 << endl;
+    cout << "m3: " << endl << m3 << endl;
+    //cout << "m1 address = " << &m1 << ", m2 address = " << &m2 << ", m3 address = " << &m3 << endl;
 
     cout << "Testing matrix addition: " << endl;
     Matrix a({{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}});
