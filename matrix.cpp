@@ -42,6 +42,23 @@ public:
         }
     }
 
+    // copy constructor
+    Matrix(const Matrix& mat)
+    {
+        this->m = mat.get_m();
+        this->n = mat.get_n();
+        // Allocate memory for vals.
+        this->vals = new double*[this->get_m()];
+        for (int i = 0; i < this->get_m(); i++)
+        {
+            this->vals[i] = new double[this->get_n()];
+            for (int j = 0; j < this->get_n(); j++)
+            {
+                this->vals[i][j] = mat.get_vals()[i][j];
+            }
+        }
+    }
+
     ~Matrix()
     {
         // Delete each row in vals.
@@ -170,6 +187,12 @@ public:
 
 int main()
 {
+    cout << "Testing copy constructor: " << endl;
+    Matrix m1({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}, {13, 14, 15}});
+    Matrix m2(m1);
+    cout << "m1: " << endl << m1 << endl;
+    cout << "m2: " << endl << m2 << endl;
+
     cout << "Testing matrix addition: " << endl;
     Matrix a({{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}});
     cout << "a: " << endl << a << endl;
