@@ -12,6 +12,16 @@ private:
     double **vals; // 2-D array of values in the matrix
 
 public:
+    // constructors
+
+    // default constructor
+    Matrix()
+    {
+        this->m = 0;
+        this->n = 0;
+        this->vals = nullptr;
+    }
+
     Matrix(const int num_rows, const int num_cols)
     {
         this->m = num_rows;
@@ -49,15 +59,42 @@ public:
         this->copy_from(mat);
     }
 
+    // move constructor
+    Matrix(Matrix&& rhs)
+    {
+        this->move_from(std::move(rhs));
+    }
+
+    // destructor
     ~Matrix()
     {
-        // Delete each row in vals.
-        for (int i = 0; i < this->get_m(); i++)
+        if (this->get_vals() != nullptr)
         {
-            delete[] vals[i];
+            // Delete each row in vals.
+            for (int i = 0; i < this->get_m(); i++)
+            {
+                delete[] vals[i];
+            }
+            // Delete the array of pointers (vals).
+            delete[] vals;
         }
-        // Delete the array of pointers (vals).
-        delete[] vals;
+    }
+
+    // set and get methods
+
+    void set_m(const int num_rows)
+    {
+        this->m = num_rows;
+    }
+
+    void set_n(const int num_cols)
+    {
+        this->n = num_cols;
+    }
+
+    void set_vals(double** values)
+    {
+        this->vals = values;
     }
 
     int get_m() const
@@ -75,10 +112,13 @@ public:
         return this->vals;
     }
 
+    // Set a value at a particular cell.
     void set_val(const int i, const int j, const int val)
     {
         this->vals[i][j] = val;
     }
+
+    // other methods and operators
 
     Matrix operator + (const Matrix& op) const
     {
@@ -120,6 +160,15 @@ public:
         return result;
     }
 
+    void delete_vals()
+    {
+        for (int i = 0; i < this->get_m(); i++)
+        {
+            delete[] this->vals[i];
+        }
+        delete[] this->vals;
+    }
+
     void copy_from (const Matrix& mat)
     {
         if (this != &mat)
@@ -127,11 +176,7 @@ public:
             // Delete the old vals.
             if (this->get_vals() != nullptr)
             {   
-                for (int i = 0; i < this->get_m(); i++)
-                {
-                    delete[] vals[i];
-                }
-                delete[] vals;
+                this->delete_vals();
             }
 
             this->m = mat.get_m();
@@ -149,12 +194,33 @@ public:
         }
     }
 
-    Matrix& operator = (const Matrix& op)
+    void move_from(Matrix&& rhs)
+    {
+        // Delete the old vals.
+        if (this->get_vals() != nullptr)
+        {   
+            this->delete_vals();
+        }
+
+        this->set_m(rhs.get_m());
+        this->set_n(rhs.get_n());
+        this->set_vals(rhs.get_vals());
+
+        rhs.set_vals(nullptr);
+    }
+
+    const Matrix& operator = (const Matrix& op)
     {
         if (this != &op)
         {
             this->copy_from(op);
         }
+        return *this;
+    }
+
+    const Matrix& operator = (Matrix&& rhs) noexcept
+    {
+        this->move_from(std::move(rhs));
         return *this;
     }
 
@@ -218,11 +284,13 @@ int main()
     cout << "Testing copy constructor: " << endl;
     Matrix m1({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}, {13, 14, 15}});
     Matrix m2(m1);
-    Matrix m3 = m2;
+    Matrix m3;
+    Matrix m4;
+    m4 = m3 = m2;
     cout << "m1: " << endl << m1 << endl;
     cout << "m2: " << endl << m2 << endl;
     cout << "m3: " << endl << m3 << endl;
-    cout << "m1 address = " << &m1 << ", m2 address = " << &m2 << ", m3 address = " << &m3 << endl;
+    cout << "m4: " << endl << m4 << endl;
 
     cout << "Testing matrix addition: " << endl;
     Matrix a({{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}});
