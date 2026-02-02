@@ -122,18 +122,18 @@ public:
 
     void copy_from (const Matrix& mat)
     {
-        // Delete the old vals.
-        if (this->get_vals() != nullptr)
-        {   
-            for (int i = 0; i < this->get_m(); i++)
-            {
-                delete[] vals[i];
-            }
-            delete[] vals;
-        }
-
         if (this != &mat)
         {
+            // Delete the old vals.
+            if (this->get_vals() != nullptr)
+            {   
+                for (int i = 0; i < this->get_m(); i++)
+                {
+                    delete[] vals[i];
+                }
+                delete[] vals;
+            }
+
             this->m = mat.get_m();
             this->n = mat.get_n();
             // Allocate memory for vals.
@@ -222,7 +222,7 @@ int main()
     cout << "m1: " << endl << m1 << endl;
     cout << "m2: " << endl << m2 << endl;
     cout << "m3: " << endl << m3 << endl;
-    //cout << "m1 address = " << &m1 << ", m2 address = " << &m2 << ", m3 address = " << &m3 << endl;
+    cout << "m1 address = " << &m1 << ", m2 address = " << &m2 << ", m3 address = " << &m3 << endl;
 
     cout << "Testing matrix addition: " << endl;
     Matrix a({{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}});
