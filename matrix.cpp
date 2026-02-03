@@ -98,6 +98,12 @@ public:
         return this->vals;
     }
 
+    // Get a value at a particular cell.
+    double get_val(const int i, const int j) const
+    {
+        return this->get_vals()[i][j];
+    }
+
     // Set a value at a particular cell.
     void set_val(const int i, const int j, const int val)
     {
@@ -117,7 +123,7 @@ public:
         {
             for (int j = 0; j < this->get_n(); j++)
             {
-                result.set_val(i, j, this->vals[i][j] + op.get_vals()[i][j]);
+                result.set_val(i, j, this->get_val(i, j) + op.get_val(i, j));
             }
         }
         return result;
@@ -130,7 +136,7 @@ public:
             throw runtime_error("Matrix 1's number of columns must equal Matrix 2's number of rows.");
         }
         Matrix result(this->get_m(), op.get_n());
-        int x = 0;
+        double x = 0;
         for (int i = 0; i < this->get_m(); i++)
         {
             for (int j = 0; j < op.get_n(); j++)
@@ -138,7 +144,7 @@ public:
                 x = 0;
                 for (int k = 0; k < this->get_n(); k++)
                 {
-                    x += this->vals[i][k] * op.get_vals()[k][j];
+                    x += this->get_val(i, k) * op.get_val(k, j);
                 }
                 result.set_val(i, j, x);
             }
@@ -175,7 +181,7 @@ public:
                 this->vals[i] = new double[this->get_n()];
                 for (int j = 0; j < this->get_n(); j++)
                 {
-                    this->set_val(i, j, mat.get_vals()[i][j]);
+                    this->set_val(i, j, mat.get_val(i, j));
                 }
             }
         }
@@ -201,10 +207,11 @@ public:
 
     const Matrix& operator = (const Matrix& op)
     {
-        if (this != &op)
-        {
-            this->copy_from(op);
-        }
+        // if (this != &op)
+        // {
+        //     this->copy_from(op);
+        // }
+        this->copy_from(op);
         return *this;
     }
 
@@ -221,7 +228,7 @@ public:
             os << "[ ";
             for (int j = 0; j < op.get_n(); j++) 
             {
-                os << std::setw(4) << op.get_vals()[i][j] << " ";
+                os << std::setw(4) << op.get_val(i, j) << " ";
             }
             os << " ]" << std::endl;
         }
