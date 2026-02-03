@@ -15,52 +15,38 @@ public:
     // constructors
 
     // default constructor
-    Matrix()
-    {
-        this->m = 0;
-        this->n = 0;
-        this->vals = nullptr;
-    }
+    Matrix(): m(0), n(0), vals(nullptr) {}
 
-    Matrix(const int num_rows, const int num_cols)
+    Matrix(const int num_rows, const int num_cols): m(num_rows), n(num_cols), vals(new double*[m])
     {
-        this->m = num_rows;
-        this->n = num_cols;
-
-        // Allocate memory for vals.
-        this->vals = new double*[this->get_m()];
+        // Initialize vals.
         for (int i = 0; i < this->get_m(); i++)
         {
             this->vals[i] = new double[this->get_n()];
         }
     }
 
-    Matrix(const std::vector<std::vector<double>>& values)
+    Matrix(const std::vector<std::vector<double>>& values): m(values.size()), n(values[0].size()), vals(new double*[m])
     {
-        this->m = values.size();
-        this->n = values[0].size();
-
-        // Allocate memory for vals.
-        this->vals = new double*[this->get_m()];
+        // Initialize vals.
         for (int i = 0; i < this->get_m(); i++)
         {
             this->vals[i] = new double[this->get_n()];
             for (int j = 0; j < this->get_n(); j++)
             {
-                this->vals[i][j] = values[i][j];
+                this->set_val(i, j, values[i][j]);
             }
         }
     }
 
     // copy constructor
-    Matrix(const Matrix& mat)
+    Matrix(const Matrix& mat): vals(nullptr)
     {
-        this->vals = nullptr;
         this->copy_from(mat);
     }
 
     // move constructor
-    Matrix(Matrix&& rhs)
+    Matrix(Matrix&& rhs): vals(nullptr)
     {
         this->move_from(std::move(rhs));
     }
@@ -179,9 +165,10 @@ public:
                 this->delete_vals();
             }
 
-            this->m = mat.get_m();
-            this->n = mat.get_n();
-            // Allocate memory for vals.
+            this->set_m(mat.get_m());
+            this->set_n(mat.get_n());
+
+            // Initialize vals.
             this->vals = new double*[this->get_m()];
             for (int i = 0; i < this->get_m(); i++)
             {
@@ -196,17 +183,20 @@ public:
 
     void move_from(Matrix&& rhs)
     {
-        // Delete the old vals.
-        if (this->get_vals() != nullptr)
-        {   
-            this->delete_vals();
+        if (this != &rhs)
+        {
+            // Delete the old vals.
+            if (this->get_vals() != nullptr)
+            {   
+                this->delete_vals();
+            }
+
+            this->set_m(rhs.get_m());
+            this->set_n(rhs.get_n());
+            this->set_vals(rhs.get_vals());
+
+            rhs.set_vals(nullptr);
         }
-
-        this->set_m(rhs.get_m());
-        this->set_n(rhs.get_n());
-        this->set_vals(rhs.get_vals());
-
-        rhs.set_vals(nullptr);
     }
 
     const Matrix& operator = (const Matrix& op)
