@@ -207,10 +207,6 @@ public:
 
     const Matrix& operator = (const Matrix& op)
     {
-        // if (this != &op)
-        // {
-        //     this->copy_from(op);
-        // }
         this->copy_from(op);
         return *this;
     }
